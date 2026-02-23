@@ -1,0 +1,28 @@
+# Syncs all branches and tags from wakican4d-hash/Designinhtmlcss to mdwaseemakram9274/credit-card-marketplace
+# Last triggered: 2026-02-23 08:50 UTC
+name: Sync to mdwaseemakram9274/credit-card-marketplace
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to destination repository
+        run: |
+          git remote add destination https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/mdwaseemakram9274/credit-card-marketplace.git
+          git push destination --all --force
+          git push destination --tags --force
