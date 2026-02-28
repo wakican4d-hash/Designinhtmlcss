@@ -374,7 +374,8 @@ function AddCardContent({
     renewalFee: editingCard?.renewalFee || '',
     cardImage: editingCard?.image || 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400',
     benefits: editingCard?.benefits || ['Welcome bonus of reward points', 'Complimentary airport lounge access', 'Fuel surcharge waiver'],
-    categories: editingCard?.categories || ['Travel']
+    categories: editingCard?.categories || ['Travel'],
+    networks: editingCard?.networks || []
   });
 
   const sections = [
@@ -498,6 +499,42 @@ function FormSection({ sectionId, cardTypes, cardNetworks, formData, setFormData
   formData: any;
   setFormData: (data: any) => void;
 }) {
+  const [selectedCardTypes, setSelectedCardTypes] = useState<Array<{name: string; icon: string}>>(
+    formData.categories?.map((cat: string) => 
+      cardTypes.find(t => t.name === cat) || { name: cat, icon: '🏷️' }
+    ) || []
+  );
+
+  const [selectedNetworks, setSelectedNetworks] = useState<string[]>(
+    formData.networks || []
+  );
+
+  const toggleCardType = (type: {name: string; icon: string}) => {
+    const isSelected = selectedCardTypes.some(t => t.name === type.name);
+    const newSelection = isSelected
+      ? selectedCardTypes.filter(t => t.name !== type.name)
+      : [...selectedCardTypes, type];
+    
+    setSelectedCardTypes(newSelection);
+    setFormData({
+      ...formData,
+      categories: newSelection.map(t => t.name)
+    });
+  };
+
+  const toggleNetwork = (network: string) => {
+    const isSelected = selectedNetworks.includes(network);
+    const newSelection = isSelected
+      ? selectedNetworks.filter(n => n !== network)
+      : [...selectedNetworks, network];
+    
+    setSelectedNetworks(newSelection);
+    setFormData({
+      ...formData,
+      networks: newSelection
+    });
+  };
+
   if (sectionId === 'basic') {
     return (
       <div className="space-y-4">
@@ -543,25 +580,54 @@ function FormSection({ sectionId, cardTypes, cardNetworks, formData, setFormData
             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Card Type *</label>
-            <select className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>Select Type</option>
-              {cardTypes.map((type) => (
-                <option key={type.name} value={type.name}>{type.icon} {type.name}</option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-3">Card Type *</label>
+            <div className="flex flex-wrap gap-2">
+              {cardTypes.map((type) => {
+                const isSelected = selectedCardTypes.some(t => t.name === type.name);
+                return (
+                  <button
+                    key={type.name}
+                    type="button"
+                    onClick={() => toggleCardType(type)}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      isSelected
+                        ? 'bg-blue-600 text-white shadow-sm hover:bg-blue-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                    }`}
+                  >
+                    <span className="text-base">{type.icon}</span>
+                    <span>{type.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Network *</label>
-            <select className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option>Select Network</option>
-              {cardNetworks.map((network) => (
-                <option key={network} value={network}>{network}</option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-3">Network *</label>
+            <div className="flex flex-wrap gap-2">
+              {cardNetworks.map((network) => {
+                const isSelected = selectedNetworks.includes(network);
+                return (
+                  <button
+                    key={network}
+                    type="button"
+                    onClick={() => toggleNetwork(network)}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                      isSelected
+                        ? 'bg-blue-600 text-white shadow-sm hover:bg-blue-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                    }`}
+                  >
+                    <span>{network}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Status *</label>
             <select className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
