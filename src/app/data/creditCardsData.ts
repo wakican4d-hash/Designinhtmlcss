@@ -1,4 +1,5 @@
 import imgBobcardPremier from "figma:asset/d326441dbe055cea6b310850b0fa9e9e904edcd5.png";
+import imgSbiCard from "figma:asset/9e8464a7eab87f98f526ee35bf4d41bae183ecae.png";
 
 export interface CreditCardData {
   id: string;
@@ -9,6 +10,7 @@ export interface CreditCardData {
   benefits: string[];
   categories: string[];
   description?: string;
+  cardOrientation?: 'horizontal' | 'vertical';
 }
 
 export const creditCardsData: CreditCardData[] = [
@@ -28,6 +30,7 @@ export const creditCardsData: CreditCardData[] = [
     ],
     categories: ["Dining", "Shopping", "Travel"],
     description: "Experience premium banking with BOB Premier card, designed for lifestyle enthusiasts who value rewards and travel benefits.",
+    cardOrientation: "horizontal",
   },
   {
     id: "bob-premier-bobcard-2",
@@ -44,5 +47,20 @@ export const creditCardsData: CreditCardData[] = [
     ],
     categories: ["Dining", "Shopping"],
     description: "Experience premium banking with BOB Premier card, designed for lifestyle enthusiasts who value rewards and travel benefits.",
+    cardOrientation: "horizontal",
+  },
+  {
+    id: "sbi-elite-card",
+    image: imgSbiCard,
+    title: "SBI Elite Credit Card",
+    joiningFee: "₹4999",
+    renewalFee: "₹4999",
+    benefits: [
+      "Complimentary domestic and international airport lounge access",
+      "10 Reward Points per ₹100 spent on dining, departmental stores & groceries",
+    ],
+    categories: ["Travel", "Lounge Pass", "Reward Points"],
+    description: "Premium lifestyle card with exceptional travel benefits and reward points for high spenders.",
+    cardOrientation: "vertical",
   },
 ];
