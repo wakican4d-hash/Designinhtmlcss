@@ -44,7 +44,15 @@ export default function AdminPage() {
   const [editingCard, setEditingCard] = useState<typeof extendedCardsData[0] | null>(null);
   
   // Card Types and Networks state
-  const [cardTypes, setCardTypes] = useState<string[]>(['Travel', 'Shopping', 'Dining', 'Cashback', 'Rewards', 'Fuel', 'Business']);
+  const [cardTypes, setCardTypes] = useState<Array<{name: string; icon: string}>>([
+    { name: 'Travel', icon: '✈️' },
+    { name: 'Shopping', icon: '🛍️' },
+    { name: 'Dining', icon: '🍽️' },
+    { name: 'Cashback', icon: '💰' },
+    { name: 'Rewards', icon: '🎁' },
+    { name: 'Fuel', icon: '⛽' },
+    { name: 'Business', icon: '💼' }
+  ]);
   const [cardNetworks, setCardNetworks] = useState<string[]>(['Visa', 'Mastercard', 'RuPay', 'American Express']);
 
   // Get unique banks for filter
@@ -352,7 +360,7 @@ function AddCardContent({
 }: { 
   editingCard: typeof extendedCardsData[0] | null; 
   setEditingCard: (value: typeof extendedCardsData[0] | null) => void;
-  cardTypes: string[];
+  cardTypes: Array<{name: string; icon: string}>;
   cardNetworks: string[];
 }) {
   const [openSection, setOpenSection] = useState<string | null>('basic');
@@ -485,7 +493,7 @@ function AddCardContent({
 
 function FormSection({ sectionId, cardTypes, cardNetworks, formData, setFormData }: { 
   sectionId: string; 
-  cardTypes: string[]; 
+  cardTypes: Array<{name: string; icon: string}>; 
   cardNetworks: string[];
   formData: any;
   setFormData: (data: any) => void;
@@ -541,7 +549,7 @@ function FormSection({ sectionId, cardTypes, cardNetworks, formData, setFormData
             <select className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option>Select Type</option>
               {cardTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
+                <option key={type.name} value={type.name}>{type.icon} {type.name}</option>
               ))}
             </select>
           </div>
@@ -1116,8 +1124,8 @@ function BanksManagementContent({
   cardNetworks,
   setCardNetworks
 }: {
-  cardTypes: string[];
-  setCardTypes: (types: string[]) => void;
+  cardTypes: Array<{name: string; icon: string}>;
+  setCardTypes: (types: Array<{name: string; icon: string}>) => void;
   cardNetworks: string[];
   setCardNetworks: (networks: string[]) => void;
 }) {
@@ -1136,8 +1144,10 @@ function BanksManagementContent({
   
   // Card Type management state
   const [newCardType, setNewCardType] = useState('');
+  const [newCardTypeIcon, setNewCardTypeIcon] = useState('🏷️');
   const [showAddTypeModal, setShowAddTypeModal] = useState(false);
-  const [deleteConfirmType, setDeleteConfirmType] = useState<string | null>(null);
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const [deleteConfirmType, setDeleteConfirmType] = useState<{name: string; icon: string} | null>(null);
   
   // Card Network management state
   const [newCardNetwork, setNewCardNetwork] = useState('');
@@ -1222,17 +1232,78 @@ function BanksManagementContent({
   
   // Card Type handlers
   const handleAddCardType = () => {
-    if (newCardType.trim() && !cardTypes.includes(newCardType.trim())) {
-      setCardTypes([...cardTypes, newCardType.trim()]);
+    if (newCardType.trim() && !cardTypes.some(t => t.name === newCardType.trim())) {
+      setCardTypes([...cardTypes, { name: newCardType.trim(), icon: newCardTypeIcon }]);
       setNewCardType('');
+      setNewCardTypeIcon('🏷️');
       setShowAddTypeModal(false);
     }
   };
   
-  const handleDeleteCardType = (type: string) => {
-    setCardTypes(cardTypes.filter(t => t !== type));
+  const handleDeleteCardType = (type: {name: string; icon: string}) => {
+    setCardTypes(cardTypes.filter(t => t.name !== type.name));
     setDeleteConfirmType(null);
   };
+  
+  // Icon options for card types (400+ icons organized by category)
+  const cardTypeIconOptions = [
+    // Finance & Money
+    '💰', '💵', '💴', '💶', '💷', '💳', '💎', '🪙', '💸', '🏦', '🤑', '💹', '📈', '📊',
+    
+    // Travel & Transportation
+    '✈️', '🛫', '🛬', '🌍', '🌎', '🌏', '🗺️', '🧳', '🎒', '🏝️', '🗼', '🏰', '🏛️', '⛩️',
+    '🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜',
+    '🛵', '🏍️', '🚲', '🛴', '🚂', '🚆', '🚇', '🚈', '🚉', '🚝', '🚄', '🚅', '🚞',
+    '⛴️', '🛥️', '⛵', '🚤', '🛳️', '⚓', '🚁', '🛩️',
+    
+    // Shopping & Retail
+    '🛍️', '🛒', '🏪', '🏬', '🏢', '🏷️', '💝', '🎁', '📦', '📮', '🎀', '🛏️', '🪑',
+    
+    // Food & Dining
+    '🍽️', '🍴', '🥄', '🔪', '🥢', '🍕', '🍔', '🍟', '🌭', '🥪', '🌮', '🌯', '🥙', '🍗',
+    '🍖', '🥩', '🍝', '🍜', '🍲', '🍱', '🍛', '🍣', '🍤', '🥟', '🍙', '🥘', '🍚',
+    '☕', '🍵', '🥤', '🍺', '🍻', '🥂', '🍷', '🥃', '🍸', '🍹', '🧃', '🧋', '🍰', '🎂',
+    
+    // Entertainment & Leisure
+    '🎬', '🎭', '🎪', '🎨', '🎮', '🎯', '🎲', '🎰', '🎳', '🎵', '🎶', '🎤', '🎧', '🎸',
+    '🎹', '🎺', '🎻', '🥁', '🎼', '🎙️', '📻', '📺', '📹', '📷', '📸', '🎥', '🎞️',
+    
+    // Sports & Fitness
+    '⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🏓', '🏸', '🏒', '🏑',
+    '🥍', '🏏', '⛳', '🏹', '🎣', '🥊', '🥋', '🤺', '⛷️', '🏂', '🏋️', '🤸', '🤾',
+    '🏊', '🤽', '🚣', '🧘', '🚴', '🤹', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️',
+    
+    // Business & Office
+    '💼', '👔', '🎓', '📊', '📈', '📉', '💹', '💻', '⌨️', '🖱️', '🖨️', '📱', '☎️',
+    '📞', '📠', '📧', '📨', '📩', '📤', '📥', '🗂️', '📁', '📂', '📋', '📌', '📍',
+    '✏️', '✒️', '🖊️', '🖋️', '📝', '📚', '📖', '📓', '📔', '📒', '📕', '📗', '📘', '📙',
+    
+    // Health & Medical
+    '💊', '💉', '🩺', '🩹', '🌡️', '🧬', '🔬', '🧪', '⚕️', '🏥', '🚑', '🧑‍⚕️',
+    
+    // Technology & Digital
+    '💻', '📱', '⌨️', '🖱️', '🖥️', '💾', '💿', '📀', '🎮', '🕹️', '📡', '🔋', '🔌',
+    '💡', '🔦', '🕯️', '🪔', '🧯', '🛢️', '⚡', '🔥', '💥', '✨', '⚙️', '🔧', '🔨',
+    
+    // Symbols & Special
+    '⭐', '🌟', '✨', '💫', '🔥', '💥', '🎯', '🎪', '🎨', '🏆', '👑', '💎', '🔱',
+    '⚡', '🌈', '☀️', '🌙', '⭐', '🌠', '💖', '💝', '💘', '❤️', '🧡', '💛', '💚',
+    '💙', '💜', '🖤', '🤍', '🤎', '❣️', '💕', '💞', '💓', '💗', '💖', '✅', '✔️',
+    '🔰', '🔱', '⚜️', '🏷️', '🎫', '🎟️', '🔖',
+    
+    // Nature & Animals
+    '🌳', '🌲', '🌴', '🌱', '🌿', '🍀', '🌾', '🌺', '🌻', '🌹', '🌷', '🌼', '💐',
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷',
+    
+    // Time & Calendar
+    '⏰', '⏱️', '⏲️', '⏳', '⌛', '📅', '📆', '🗓️',
+    
+    // Fuel & Energy
+    '⛽', '🔋', '🔌', '⚡', '🔥', '💡',
+    
+    // Gifts & Rewards
+    '🎁', '🎀', '🎉', '🎊', '🎈', '🪅', '🎂', '🍰', '🧁', '🥳', '🏆', '🥇', '💝'
+  ];
   
   // Card Network handlers
   const handleAddCardNetwork = () => {
@@ -1344,8 +1415,9 @@ function BanksManagementContent({
         </div>
         <div className="flex flex-wrap gap-2">
           {cardTypes.map((type) => (
-            <div key={type} className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
-              <span className="text-sm font-medium text-gray-700">{type}</span>
+            <div key={type.name} className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
+              <span className="text-base">{type.icon}</span>
+              <span className="text-sm font-medium text-gray-700">{type.name}</span>
               <button
                 onClick={() => setDeleteConfirmType(type)}
                 className="p-0.5 hover:bg-red-100 rounded transition-colors"
@@ -1529,6 +1601,8 @@ function BanksManagementContent({
                   onClick={() => {
                     setShowAddTypeModal(false);
                     setNewCardType('');
+                    setNewCardTypeIcon('🏷️');
+                    setShowIconPicker(false);
                   }}
                   className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                 >
@@ -1538,28 +1612,72 @@ function BanksManagementContent({
                 </button>
               </div>
             </div>
-            <div className="p-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type Name *
-              </label>
-              <input
-                type="text"
-                value={newCardType}
-                onChange={(e) => setNewCardType(e.target.value)}
-                placeholder="e.g., Fuel, Business, Premium"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddCardType();
-                  }
-                }}
-              />
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type Name *
+                </label>
+                <input
+                  type="text"
+                  value={newCardType}
+                  onChange={(e) => setNewCardType(e.target.value)}
+                  placeholder="e.g., Fuel, Business, Premium"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && !showIconPicker) {
+                      handleAddCardType();
+                    }
+                  }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Icon *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowIconPicker(!showIconPicker)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 border border-gray-300 rounded-lg text-sm hover:border-blue-500 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{newCardTypeIcon}</span>
+                    <span className="text-gray-700">Click to choose icon</span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showIconPicker ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {showIconPicker && (
+                  <div className="mt-2 p-3 border border-gray-200 rounded-lg bg-gray-50 max-h-80 overflow-y-auto">
+                    <div className="grid grid-cols-8 gap-2">
+                      {cardTypeIconOptions.map((icon) => (
+                        <button
+                          key={icon}
+                          type="button"
+                          onClick={() => {
+                            setNewCardTypeIcon(icon);
+                            setShowIconPicker(false);
+                          }}
+                          className={`text-2xl p-2 rounded-lg hover:bg-blue-100 transition-colors ${
+                            newCardTypeIcon === icon ? 'bg-blue-100 ring-2 ring-blue-500' : 'bg-white'
+                          }`}
+                          title={icon}
+                        >
+                          {icon}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="p-6 border-t border-gray-200 flex items-center justify-end gap-3">
               <button
                 onClick={() => {
                   setShowAddTypeModal(false);
                   setNewCardType('');
+                  setNewCardTypeIcon('🏷️');
+                  setShowIconPicker(false);
                 }}
                 className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
               >
@@ -1645,7 +1763,7 @@ function BanksManagementContent({
             </div>
             <div className="p-6">
               <p className="text-sm text-gray-600">
-                Are you sure you want to delete the card type <span className="font-semibold text-gray-900">"{deleteConfirmType}"</span>?
+                Are you sure you want to delete the card type <span className="inline-flex items-center gap-1.5 font-semibold text-gray-900"><span className="text-base">{deleteConfirmType.icon}</span> "{deleteConfirmType.name}"</span>?
               </p>
               <p className="text-sm text-gray-500 mt-2">
                 This action cannot be undone.
