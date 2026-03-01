@@ -298,7 +298,11 @@ function DashboardContent({
                     <img 
                       src={card.image} 
                       alt={card.cardName}
-                      className="w-16 h-10 object-cover rounded border border-gray-200"
+                      className={`rounded border border-gray-200 ${
+                        card.cardOrientation === 'vertical'
+                          ? 'w-12 h-16 object-contain'
+                          : 'w-16 h-10 object-cover'
+                      }`}
                     />
                   </td>
                   <td className="px-4 py-4 text-sm font-medium text-gray-900">{card.bank}</td>
